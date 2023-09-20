@@ -67,8 +67,8 @@ int main(int argc, char **argv) {
     Eigen::MatrixXd V_cow, V_spring;
     Eigen::MatrixXi F_cow, F_spring;
 
-    igl::readOBJ("../../../data/spot.obj", V_cow, F_cow);
-    igl::readOBJ("../../../data/spring.obj", V_spring, F_spring);
+    igl::readOBJ("../../../data/homework1/spot.obj", V_cow, F_cow);
+    igl::readOBJ("../../../data/homework1/spring.obj", V_spring, F_spring);
 
     //setup simulation variables
     q.resize(1);
