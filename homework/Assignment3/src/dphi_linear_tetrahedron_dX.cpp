@@ -14,10 +14,9 @@ void dphi_linear_tetrahedron_dX(Eigen::Matrix43d &dphi, Eigen::Ref<const Eigen::
     Eigen::Vector3d X3 = V.row(element(3));
     Eigen::Matrix3d T;
     T << (X1 - X0), (X2 - X0), (X3 - X0);
-    Eigen::Matrix3d T_inv = T.inverse();
     //按照列求和
-    Eigen::Vector3d phi0 = T_inv.colwise().sum();
-    dphi.block(1,0, 3, 3) = T_inv;
-    dphi.block(0, 0, 1, 3) = -phi0;
+    dphi.block(1, 0, 3, 3) = T.inverse();
+    dphi.block(0, 0, 1, 3) = dphi.block<3, 3>(1, 0).colwise().sum() * -1.0;
+    
     return ;
 }

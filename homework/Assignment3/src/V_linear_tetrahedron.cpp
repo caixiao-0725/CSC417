@@ -9,8 +9,16 @@ void V_linear_tetrahedron(double &energy, Eigen::Ref<const Eigen::VectorXd> q,
                           double C, double D) {
 
     auto neohookean_linear_tet = [&](double &e, Eigen::Ref<const Eigen::VectorXd>q, Eigen::Ref<const Eigen::RowVectorXi> element, Eigen::Ref<const Eigen::Vector3d> X) {
-        
-       
+        Eigen::Matrix34d x;
+        Eigen::Matrix43d dphi;
+        x << q.segment<3>(element(0) * 3),
+            q.segment<3>(element(1) * 3),
+            q.segment<3>(element(2) * 3),
+            q.segment<3>(element(3) * 3);
+
+        dphi_linear_tetrahedron_dX(dphi, V, element, X);
+        // F = x * dphi
+        psi_neo_hookean(e, x * dphi, C, D);
     };
 
     quadrature_single_point(energy, q, element, volume, neohookean_linear_tet);  

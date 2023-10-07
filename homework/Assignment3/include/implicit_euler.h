@@ -20,6 +20,28 @@ template<typename ENERGY, typename FORCE, typename STIFFNESS>
 inline void implicit_euler(Eigen::VectorXd &q, Eigen::VectorXd &qdot, double dt, 
                             const Eigen::SparseMatrixd &mass,  ENERGY &energy, FORCE &force, STIFFNESS &stiffness, 
                             Eigen::VectorXd &tmp_qdot, Eigen::VectorXd &tmp_force, Eigen::SparseMatrixd &tmp_stiffness) {
-    
+    // Define cost function, its gradient and hessian
+    auto cost = [&](const Eigen::VectorXd& v) {
+        return 0.5 * (v - qdot).transpose() * mass * (v - qdot) + energy(v);
+        };
+
+    auto grad_cost = [&](Eigen::VectorXd& d_cost, Eigen::VectorXd& v) {
+        tmp_force.setZero();
+        force(tmp_force, q + dt * v, v);
+        d_cost = mass * (v - qdot) - dt * tmp_force;
+        };
+
+    auto hess_cost = [&](Eigen::SparseMatrixd& d2_cost, Eigen::VectorXd& v) {
+        tmp_stiffness.setZero();
+        stiffness(tmp_stiffness, q + dt * v, v);
+        d2_cost = mass - dt * dt * tmp_stiffness;
+        };
+
+    tmp_qdot = qdot;
+    double error = newtons_method(tmp_qdot, cost, grad_cost, hess_cost, 5, Eigen::VectorXd(), Eigen::SparseMatrixd());
+
+
+    qdot = tmp_qdot;
+    q = q + dt * qdot;
 
 }
